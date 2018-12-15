@@ -1,0 +1,34 @@
+{
+  "name": "javascript-recipes-app",
+  "version": "0.1.0",
+  "description": "Forkify Webapp",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production",
+    "start": "webpack-dev-server --mode development --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IsmaelB83/javascript-recipes-app.git"
+  },
+  "author": "Ismael Bernal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IsmaelB83/javascript-recipes-app/issues"
+  },
+  "homepage": "https://github.com/IsmaelB83/javascript-recipes-app#readme",
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.0",
+    "babel-loader": "^8.0.4",
+    "html-webpack-plugin": "^3.2.0",
+    "live-server": "^1.2.1",
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0"
+  }
+}
