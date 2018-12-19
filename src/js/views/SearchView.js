@@ -2,9 +2,25 @@ export default class SearchView {
 
     // Constructor
     constructor() {
-        this.container = document.querySelector('.results__list');
-        this.query = document.querySelector('.search__field');
-
+        this.searchResults = document.querySelector('.results__list');
+        this.searchInput = document.querySelector('.search__field');
+        this.searchButton = document.querySelector('.search__btn');   
+    }
+    // Getter 
+    getResults() { return this.searchResults; }
+    getInput() { return this.searchInput; }
+    getButton() { return this.searchButton; }
+    getClicked(target) {
+        let nodo = target;
+        let i = 0;
+        while (i < 4) {
+            if (nodo.className.search("results__link") === 0) {
+                return nodo.href.substring(nodo.href.search("#")+1);
+            } else {
+                nodo = nodo.parentElement;
+            }
+            i++;
+        }
     }
     // Methods
     render(recipes) {
@@ -23,11 +39,11 @@ export default class SearchView {
                         </div>
                     </a>
                 </li>`;
-            this.container.insertAdjacentHTML('beforeend', html);               
+            this.searchResults.insertAdjacentHTML('beforeend', html);               
         }
     }
     clear() {
-        this.container.innerHTML = '';
-        this.query.value = '';
+        this.searchResults.innerHTML = '';
+        this.searchInput.value = '';
     }
 }

@@ -24,16 +24,16 @@ export default class Recipe {
     getIngredients() { return this.ingredients; }
     getLoaded() { return this.loaded; };
     // Busca la receta en la API
-    async search() {
+    async callAPI() {
         try {
-            const key = 'ccf20f28754ab5b310d4a62758737ba6';
+            const key = '4c3b8c2d11f4795e0748ea22e1f2ab22';
             let response = await fetch (`https://www.food2fork.com/api/get?key=${key}&rId=${this.id}`);
             let content = await response.json();               
-            this.social_rank = content.social_rank,
-            this.publisher_url = content.publisher_url,
-            this.f2f_url = content.f2f_url,
-            this.source_url = content.source_url
-            this.ingredients = content.ingredients;
+            this.social_rank = content.recipe.social_rank,
+            this.publisher_url = content.recipe.publisher_url,
+            this.f2f_url = content.recipe.f2f_url,
+            this.source_url = content.recipe.source_url
+            this.ingredients = content.recipe.ingredients;
             this.loaded = true;
             console.log(`API call succesfull --> detail?${this.id}`);
         } catch (error) {

@@ -1,42 +1,71 @@
+// Imports
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import SearchView from './views/SearchView';
 import RecipeView from './views/RecipeView';
-//import Recipe from './models/Recipe';
+import FavouritesView from './views/FavouritesView';
 
-let searchCtrl = new Search('');
-let searchViewCtrl = new SearchView();
-let recipeViewCtrl = new RecipeView();
+// Global state of the app
+const state = {
+    search: undefined,
+    recipe: undefined,
+    shoppingList: [],
+    favourites: [],
+}
+var searchViewCtrl;
+var recipeViewCtrl;
+var favouriteView; 
 
-// Event handlers
-document.querySelector('.search__btn').addEventListener("click", search);
-document.addEventListener('keypress', (event) => {
-    if (event.keyCode === '13') {
-        search();
+init();
+
+// Init function
+function init() {
+    console.log("Init app...");
+    console.log("Creating controllers");
+    // Instantiating controllers
+    searchViewCtrl = new SearchView();
+    recipeViewCtrl = new RecipeView();
+    favouriteView = new FavouritesView();
+    // Add event handlers
+    searchViewCtrl.getButton().addEventListener("click", eventHandlerSearch);
+    document.addEventListener('keypress', (ev) => { if (ev.keyCode === '13') { eventHandlerSearch(); } });
+    searchViewCtrl.getResults().addEventListener("click", eventHandlerLoadRecipe);
+    favouriteView.getAddButton().addEventListener("click", eventHandlerAddFavs);
+}
+
+// Controller functions
+function eventHandlerSearch(event) {
+    event.preventDefault();
+    let query = searchViewCtrl.searchInput.value;
+    controllerRetrieveSearch(query);
+}
+
+function eventHandlerLoadRecipe(event) {
+    let id = searchViewCtrl.getClicked(event.target);
+    if (id !== '') {
+        controllerRetrieveRecipe(id);       
     }
-});
-document.querySelector('.results__list').addEventListener("click", (event) => {
-    // DOM Trasversing
-    let nodo = event.target;
-    let i = 0;
-    while (i < 4) {
-        if (nodo.className.search("results__link") === 0) {
-            details(nodo.href.substring(nodo.href.search("#")+1));
-        } else {
-            nodo = nodo.parentElement;
+}
+
+function eventHandlerAddFavs(event) {
+    if (event.target.classList.contains("header__likes")) {
+        if (state.recipe !== undefined) {
+            let obj = state.favourites.find(o => o.getID() === state.recipe.id);
+            if (obj === undefined) {
+                state.favourites.push(state.recipe);
+                favouriteView.addFavourite(state.recipe);
+            }   
         }
-        i++
     }
-});
+}
 
-// Async calls
-async function search(event) {
-    let query = document.querySelector('.search__field').value;
-    if (query !== '') {
+// Async functions
+async function controllerRetrieveSearch(query) {
+    if (query !== 'query') {
         try {
-            searchCtrl.setQuery(query);
-            await searchCtrl.searchRecipes();
-            let recipes = searchCtrl.getRecipes();
+            state.search = new Search(query);
+            await state.search.callAPI();
+            let recipes = state.search.getRecipes();
             searchViewCtrl.render(recipes);
         } catch (error) {
             console.log(error);
@@ -44,21 +73,20 @@ async function search(event) {
     }
 }
 
-async function details(id) {
-    if (id !== '') {
-        try {
-            for (let i = 0; i < searchCtrl.recipes.length; i++) {
-                if ( searchCtrl.recipes[i].getID() === id ) {
-                    if (searchCtrl.recipes[i].getLoaded() !== true) {
-                        searchCtrl.recipes[i].search(); 
-                    }
-                    recipeViewCtrl.render(searchCtrl.recipes[i]);
-                    break;
-                }
+async function controllerRetrieveRecipe(id) {
+    let cont = 1;
+    try {
+        let obj = state.search.recipes.find(o => o.getID() === id);
+        if (obj !== undefined && ( state.recipe === undefined || obj.getID() !== state.recipe.getID())) {
+            state.recipe = obj;
+            if (state.recipe.getLoaded() !== true) {
+                console.log(cont);
+                cont++;
+                await state.recipe.callAPI(); 
             }
-        } catch (error) {
-            console.log(error);
+            recipeViewCtrl.render(state.recipe);
         }
-        
+    } catch (error) {
+        console.log(error);
     }
 }

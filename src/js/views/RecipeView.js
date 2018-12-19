@@ -7,14 +7,30 @@ export default class RecipeView {
     // Methods
     render(recipe) {
         this.clear();
+        let htmlIngredients = '';
+        for (let i = 0; i < recipe.ingredients.length; i++) {
+            const element = recipe.ingredients[i];
+            let quantity = 0;
+            let unit = '';
+            let description = '';
+            quantity = recipe.ingredients[i].split(" ")[0];          
+            unit = recipe.ingredients[i].split(" ")[1];
+            description = recipe.ingredients[i].split(" ")[2];
+            htmlIngredients +=      
+                `<li class="recipe__item">
+                    <svg class="recipe__icon"><use href="img/icons.svg#icon-check"></use></svg>
+                    <div class="recipe__count">${quantity}</div>
+                    <div class="recipe__ingredient"><span class="recipe__unit">${unit}</span> ${description}</div>
+                </li>`;
+        }
         let html = 
-                `<figure class="recipe__fig">
-                    <img src="${recipe.image_url}" alt="Tomato" class="recipe__img">
-                    <h1 class="recipe__title">
-                        <span>${recipe.title}</span>
-                    </h1>
-                </figure>
-                <div class="recipe__details">
+            `<figure class="recipe__fig">
+                <img src="${ recipe.image_url }" alt="Tomato" class="recipe__img">
+                <h1 class="recipe__title">
+                    <span>${ recipe.title }</span>
+                </h1>
+            </figure>
+            <div class="recipe__details">
                 <div class="recipe__info">
                     <svg class="recipe__info-icon">
                         <use href="img/icons.svg#icon-stopwatch"></use>
@@ -48,13 +64,26 @@ export default class RecipeView {
                     </svg>
                 </button>
             </div>
+            
+            <div class="recipe__ingredients">
+                <ul class="recipe__ingredient-list">
+                    ${ htmlIngredients }
+                </ul>
+                <button class="btn-small recipe__btn">
+                    <svg class="search__icon">
+                        <use href="img/icons.svg#icon-shopping-cart"></use>
+                    </svg>
+                    <span>Add to shopping list</span>
+                </button>
+            </div>
+            
             <div class="recipe__directions">
                 <h2 class="heading-2">How to cook it</h2>
                 <p class="recipe__directions-text">
                     This recipe was carefully designed and tested by
-                    <span class="recipe__by">${recipe.publisher}</span>. Please check out directions at their website.
+                    <span class="recipe__by">${ recipe.publisher }</span>. Please check out directions at their website.
                 </p>
-                <a class="btn-small recipe__btn" href="${recipe.source_url}" target="_blank">
+                <a class="btn-small recipe__btn" href="${ recipe.source_url }" target="_blank">
                     <span>Directions</span>
                     <svg class="search__icon">
                         <use href="img/icons.svg#icon-triangle-right"></use>

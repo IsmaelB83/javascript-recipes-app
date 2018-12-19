@@ -11,25 +11,15 @@ export default class Search {
         this.results = 0;       // Número de resultados que retorna la búsqueda
         this.recipes = [];      // Recetas obtenidas
     }
-
     // Getters 
     getCurrentPage() { return this.currentPage; }
     getLastPage() { return this.lastPage };
     getPages() { return this.pages; };
     getResults() { return this.results; }
     getRecipes() { return this.recipes };
-    // Setters 
-    setQuery(query) { 
-        this.query = query; 
-        this.currentPage = 1;   
-        this.lastPage = false;  
-        this.pages = 1;         
-        this.results = 0;       
-        this.recipes = [];      
-    };
     // Methods
-    async searchRecipes(page='1') {
-        const key = 'ccf20f28754ab5b310d4a62758737ba6';        
+    async callAPI(page='1') {
+        const key = '4c3b8c2d11f4795e0748ea22e1f2ab22';        
         try {
             let response = await fetch (`https://www.food2fork.com/api/search?key=${key}&q=${this.query}&page${page}`);
             let content = await response.json();
@@ -62,10 +52,10 @@ export default class Search {
             return 0;
         }
     }
-    async nextPage () {
+    nextPage () {
         if (this.lastPage === false) {
             this.currentPage++;
-            return this.search(this.currentPage);
+            this.callAPI(this.currentPage);
         }
     }
     previousPage() {
