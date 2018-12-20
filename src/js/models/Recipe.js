@@ -2,7 +2,7 @@
 export default class Recipe {
 
     // Constructor de una receta
-    constructor (id, title, image_url, publisher, social_rank, publisher_url, f2f_url, source_url) {
+    constructor (id, title = '', image_url = '', publisher = '', social_rank = '', publisher_url = '', f2f_url = '', source_url = '') {
         this.id = id;
         this.publisher = publisher;
         this.publisher_url = publisher_url;
@@ -26,9 +26,12 @@ export default class Recipe {
     // Busca la receta en la API
     async callAPI() {
         try {
-            const key = '4c3b8c2d11f4795e0748ea22e1f2ab22';
+            const key = 'ccf20f28754ab5b310d4a62758737ba6';
             let response = await fetch (`https://www.food2fork.com/api/get?key=${key}&rId=${this.id}`);
             let content = await response.json();               
+            this.title = content.recipe.title,
+            this.image_url = content.recipe.image_url,
+            this.publisher = content.recipe.publisher,
             this.social_rank = content.recipe.social_rank,
             this.publisher_url = content.recipe.publisher_url,
             this.f2f_url = content.recipe.f2f_url,
