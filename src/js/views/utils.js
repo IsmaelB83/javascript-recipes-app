@@ -26,6 +26,5 @@ export const insertLoader = (container) => {
 }
 
 export const removeLoader = (container) => {
-    let loader = container.querySelector('.loader');
-    loader.parentNode.removeChild(loader);
+    container.removeChild(container.querySelector('.loader'));
 }

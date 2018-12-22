@@ -10,9 +10,6 @@ export default class RecipeView {
     renderLoader() {
         insertLoader(this.container);
     }
-    clearLoader() {
-        removeLoader(this.container);
-    }
     render(recipe) {
         this.clear();
         let htmlIngredients = '';

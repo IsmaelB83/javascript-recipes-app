@@ -43,10 +43,15 @@ function eventHandlerSearch(event) {
 }
 
 function eventHandlerPaginator(event) {
-    alert(event.target);
-    if (event.target.classList.contains("results__btn--prev") || event.target.classList.contains("results__btn--next") ) {
-        let button = event.target;
-        console.log(button);
+    let button;
+    if (event.target.classList.contains("btn-inline")) {
+        button = event.target;
+    } else if (event.target.parentNode.classList.contains("btn-inline")) {
+        button = event.target.parentNode;
+    }
+    if (button) {
+        let page = parseInt(button.dataset.goto);
+        searchViewCtrl.render(state.search.recipes, page, state.search.getResPerPage());
     }
 }
 
@@ -89,7 +94,6 @@ async function controllerRetrieveSearch(query) {
             await state.search.callAPI();
             let recipes = state.search.getRecipes();
             searchViewCtrl.render(recipes, state.search.getCurrentPage(), state.search.getResPerPage());
-            searchViewCtrl.clearLoader();
         } catch (error) {
             console.log(error);
         }
@@ -111,7 +115,6 @@ async function controllerRetrieveRecipe(id) {
             }
             recipeViewCtrl.render(state.recipe);
         }
-        recipeViewCtrl.clearLoader();
     } catch (error) {
         console.log(error);
     }

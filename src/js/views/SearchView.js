@@ -30,9 +30,6 @@ export default class SearchView {
     renderLoader() {
         insertLoader(this.searchResults);
     }
-    clearLoader() {
-        removeLoader(this.searchResults);
-    }
     render(recipes, page, resPerPage) {
         this.clear();
         for (let i = (page -1) * resPerPage; i < (page * resPerPage); i++) {
@@ -55,9 +52,10 @@ export default class SearchView {
     }
     clear() {
         this.searchResults.innerHTML = '';
+        this.resultPages.innerHTML = '';
         this.searchInput.value = '';
     }
-    paginator (results, page, resPerPage) {         
+    paginator (results, page, resPerPage) {
         let htmlPrev = 
             `<button class="btn-inline results__btn--prev" data-goto="${page - 1}">
                 <svg class="search__icon">
