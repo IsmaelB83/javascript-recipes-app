@@ -27,9 +27,10 @@ function init() {
     recipeViewCtrl = new RecipeView();
     favouriteView = new FavouritesView();
     // Add event handlers
-    searchViewCtrl.getButton().addEventListener("click", eventHandlerSearch);
     document.addEventListener('keypress', (ev) => { if (ev.keyCode === '13') { eventHandlerSearch(); } });
+    searchViewCtrl.getButton().addEventListener("click", eventHandlerSearch);
     searchViewCtrl.getResults().addEventListener("click", eventHandlerLoadRecipe);
+    searchViewCtrl.getPaginator().addEventListener("click", eventHandlerPaginator);
     favouriteView.getAddButton().addEventListener("click", eventHandlerAddFavs);
     favouriteView.getPanel().addEventListener("click", eventHandlerLoadFavourite);
 }
@@ -39,6 +40,14 @@ function eventHandlerSearch(event) {
     event.preventDefault();
     let query = searchViewCtrl.searchInput.value;
     controllerRetrieveSearch(query);
+}
+
+function eventHandlerPaginator(event) {
+    alert(event.target);
+    if (event.target.classList.contains("results__btn--prev") || event.target.classList.contains("results__btn--next") ) {
+        let button = event.target;
+        console.log(button);
+    }
 }
 
 function eventHandlerLoadRecipe(event) {
@@ -75,10 +84,12 @@ function eventHandlerLoadFavourite(event) {
 async function controllerRetrieveSearch(query) {
     if (query !== 'query') {
         try {
+            searchViewCtrl.renderLoader();
             state.search = new Search(query);
             await state.search.callAPI();
             let recipes = state.search.getRecipes();
-            searchViewCtrl.render(recipes);
+            searchViewCtrl.render(recipes, state.search.getCurrentPage(), state.search.getResPerPage());
+            searchViewCtrl.clearLoader();
         } catch (error) {
             console.log(error);
         }
@@ -88,6 +99,7 @@ async function controllerRetrieveSearch(query) {
 async function controllerRetrieveRecipe(id) {
     try {
         let obj = state.search.recipes.find(o => o.getID() === id);
+        recipeViewCtrl.renderLoader();
         if (obj === undefined) {
             state.recipe = new Recipe(id);
             await state.recipe.callAPI(); 
@@ -99,6 +111,7 @@ async function controllerRetrieveRecipe(id) {
             }
             recipeViewCtrl.render(state.recipe);
         }
+        recipeViewCtrl.clearLoader();
     } catch (error) {
         console.log(error);
     }

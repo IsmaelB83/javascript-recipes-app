@@ -1,3 +1,5 @@
+import { insertLoader, removeLoader } from './utils'
+
 export default class RecipeView { 
 
     // Constructor
@@ -5,6 +7,12 @@ export default class RecipeView {
         this.container = document.querySelector('.recipe');
     }
     // Methods
+    renderLoader() {
+        insertLoader(this.container);
+    }
+    clearLoader() {
+        removeLoader(this.container);
+    }
     render(recipe) {
         this.clear();
         let htmlIngredients = '';

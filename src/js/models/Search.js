@@ -6,17 +6,15 @@ export default class Search {
     constructor (query) {    
         this.query = query;     // Query a efectuar
         this.currentPage = 1;   // Número de página en  la que estamos actualmente
-        this.lastPage = false;  // Indica si estamos actualmente en la página final
-        this.pages = 1;         // Número de páginas que retorna la búsqueda
+        this.resPerPage = 10;   // Número de resultados por página
         this.results = 0;       // Número de resultados que retorna la búsqueda
         this.recipes = [];      // Recetas obtenidas
     }
     // Getters 
     getCurrentPage() { return this.currentPage; }
-    getLastPage() { return this.lastPage };
-    getPages() { return this.pages; };
+    getResPerPage() { return this.resPerPage; }
     getResults() { return this.results; }
-    getRecipes() { return this.recipes };
+    getRecipes() { return this.recipes }
     // Methods
     async callAPI(page='1') {
         const key = 'ccf20f28754ab5b310d4a62758737ba6';        
@@ -50,17 +48,6 @@ export default class Search {
         } catch (error) {
             console.log (`Error while trying to search ${this.busqueda}: ${error}`);
             return 0;
-        }
-    }
-    nextPage () {
-        if (this.lastPage === false) {
-            this.currentPage++;
-            this.callAPI(this.currentPage);
-        }
-    }
-    previousPage() {
-        if (this.currentPage > 1) {
-            this.currentPage--;
         }
     }
 }

@@ -1,10 +1,13 @@
+import { limitTitle, insertLoader, removeLoader } from './utils'
+
 export default class SearchView { 
 
     // Constructor
     constructor() {
         this.searchResults = document.querySelector('.results__list');
         this.searchInput = document.querySelector('.search__field');
-        this.searchButton = document.querySelector('.search__btn');   
+        this.searchButton = document.querySelector('.search__btn');  
+        this.resultPages = document.querySelector('.results__pages'); 
     }
     // Getter 
     getResults() { return this.searchResults; }
@@ -22,32 +25,17 @@ export default class SearchView {
             i++;
         }
     }
+    getPaginator() { return this.resultPages; }
     // Methods
-    /* 'Pasta with tomato and spinach'
-     * counter: 0 / counter + word.lengt: 5 / newTitle = ['Pasta']
-     * counter: 5 / counter + word.lengt: 9 / newTitle = ['Pasta', 'with']
-     * counter: 9 / counter + word.lengt: 15 / newTitle = ['Pasta', 'with', 'tomato']
-     * counter: 15 / counter + word.lengt: 21 / newTitle = ['Pasta', 'with', 'tomato']
-     * counter: 18 / counter + word.lengt: 24 / newTitle = ['Pasta', 'with', 'tomato']
-     */
-    limitTitle = function(title, limit = 17) {   // limitTitle = function(title, limit = 17)
-        const newTitle = [];
-        if (title.length > 17) {
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-            title.split(' ').reduce((counter, word) => {
-                if (counter + word.length <= limit) {
-                    newTitle.push(word);
-                }
-                return counter += word.length;
-            }, 0);
-            return `${newTitle.join(' ')} ...`;
-        }
-        return title;
+    renderLoader() {
+        insertLoader(this.searchResults);
     }
-
-    render(recipes) {
+    clearLoader() {
+        removeLoader(this.searchResults);
+    }
+    render(recipes, page, resPerPage) {
         this.clear();
-        for (let i = 0; i < recipes.length && i < 10; i++) {
+        for (let i = (page -1) * resPerPage; i < (page * resPerPage); i++) {
             const recipe = recipes[i];           
             let html = 
                 `<li>
@@ -61,11 +49,34 @@ export default class SearchView {
                         </div>
                     </a>
                 </li>`;
-            this.searchResults.insertAdjacentHTML('beforeend', html);               
+            this.searchResults.insertAdjacentHTML('beforeend', html);
         }
+        this.paginator(recipes.length, page, resPerPage);         
     }
     clear() {
         this.searchResults.innerHTML = '';
         this.searchInput.value = '';
+    }
+    paginator (results, page, resPerPage) {         
+        let htmlPrev = 
+            `<button class="btn-inline results__btn--prev" data-goto="${page - 1}">
+                <svg class="search__icon">
+                    <use href="img/icons.svg#icon-triangle-left"></use>
+                </svg>
+                <span>Page ${page - 1}</span>
+            </button>`
+        let htmlNext = 
+            `<button class="btn-inline results__btn--next" data-goto="${page + 1}">
+                <span>Page ${page + 1}</span>
+                <svg class="search__icon">
+                    <use href="img/icons.svg#icon-triangle-right"></use>
+                </svg>
+            </button>`;
+        if (page >  1) {
+            this.resultPages.insertAdjacentHTML('afterbegin', htmlPrev);
+        }
+        if ( page * resPerPage < results ) {
+            this.resultPages.insertAdjacentHTML('beforeend', htmlNext);
+        }
     }
 }
