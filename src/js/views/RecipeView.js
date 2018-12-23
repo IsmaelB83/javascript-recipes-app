@@ -14,18 +14,12 @@ export default class RecipeView {
         this.clear();
         let htmlIngredients = '';
         for (let i = 0; i < recipe.ingredients.length; i++) {
-            const element = recipe.ingredients[i];
-            let quantity = 0;
-            let unit = '';
-            let description = '';
-            quantity = recipe.ingredients[i].split(" ")[0];          
-            unit = recipe.ingredients[i].split(" ")[1];
-            description = recipe.ingredients[i].split(" ")[2];
+            const ingredient = recipe.ingredients[i];
             htmlIngredients +=      
                 `<li class="recipe__item">
                     <svg class="recipe__icon"><use href="img/icons.svg#icon-check"></use></svg>
-                    <div class="recipe__count">${quantity}</div>
-                    <div class="recipe__ingredient"><span class="recipe__unit">${unit}</span> ${description}</div>
+                    <div class="recipe__count">${ingredient.quantity.toFixed(2)}</div>
+                    <div class="recipe__ingredient"><span class="recipe__unit">${ingredient.unit}</span> ${ingredient.description}</div>
                 </li>`;
         }
         let html = 
@@ -41,14 +35,14 @@ export default class RecipeView {
                         <use href="img/icons.svg#icon-stopwatch"></use>
                     </svg>
                     <span class="recipe__info-data recipe__info-data--minutes"></span>
-                    <span class="recipe__info-text"> minutes</span>
+                    <span class="recipe__info-text">${recipe.minutes.toFixed(0)} minutes</span>
                 </div>
                 <div class="recipe__info">
                     <svg class="recipe__info-icon">
                         <use href="img/icons.svg#icon-man"></use>
                     </svg>
                     <span class="recipe__info-data recipe__info-data--people"></span>
-                    <span class="recipe__info-text"> servings</span>
+                    <span class="recipe__info-text">${recipe.servings} servings</span>
 
                     <div class="recipe__info-buttons">
                         <button class="btn-tiny">

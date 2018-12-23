@@ -35,7 +35,7 @@ function init() {
     favouriteView.getPanel().addEventListener("click", eventHandlerLoadFavourite);
 }
 
-// Controller functions
+// Event handlers
 function eventHandlerSearch(event) {
     event.preventDefault();
     let query = searchViewCtrl.searchInput.value;
@@ -43,12 +43,7 @@ function eventHandlerSearch(event) {
 }
 
 function eventHandlerPaginator(event) {
-    let button;
-    if (event.target.classList.contains("btn-inline")) {
-        button = event.target;
-    } else if (event.target.parentNode.classList.contains("btn-inline")) {
-        button = event.target.parentNode;
-    }
+    let button = event.target.closest(".btn-inline");
     if (button) {
         let page = parseInt(button.dataset.goto);
         searchViewCtrl.render(state.search.recipes, page, state.search.getResPerPage());
@@ -93,7 +88,7 @@ async function controllerRetrieveSearch(query) {
             state.search = new Search(query);
             await state.search.callAPI();
             let recipes = state.search.getRecipes();
-            searchViewCtrl.render(recipes, state.search.getCurrentPage(), state.search.getResPerPage());
+            searchViewCtrl.render(recipes, 1, state.search.getResPerPage());
         } catch (error) {
             console.log(error);
         }
@@ -114,6 +109,7 @@ async function controllerRetrieveRecipe(id) {
                 await state.recipe.callAPI(); 
             }
             recipeViewCtrl.render(state.recipe);
+            console.log(state.recipe);
         }
     } catch (error) {
         console.log(error);
