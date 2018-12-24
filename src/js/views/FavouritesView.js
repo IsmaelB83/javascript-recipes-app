@@ -2,14 +2,14 @@ export default class FavouritesView {
 
     // Constructor
     constructor() {
-        this.addFavouritesButton = document.querySelector('.recipe');
+        this.recipePanel = document.querySelector('.recipe');
         this.viewFavouritesButton = document.querySelector('.likes__icon');
         this.favouritesPanel = document.querySelector('.likes__list');
     }
     // Getters
-    getAddButton() { return this.addFavouritesButton; }
-    getViewButton() { return this.viewFavouritesButton; }
-    getPanel() { return this.favouritesPanel; }
+    getRecipePanel() { return this.recipePanel; }
+    getFavouritesPanel() { return this.favouritesPanel; }
+    getViewFavouritesButton() { return this.viewFavouritesButton; }
     // Inserts favourite in the list
     addFavourite(recipe) {
         let html = 

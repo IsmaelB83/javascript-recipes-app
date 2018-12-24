@@ -14,15 +14,16 @@ export default class SearchView {
     getInput() { return this.searchInput; }
     getButton() { return this.searchButton; }
     getClicked(target) {
-        let nodo = target;
-        let i = 0;
-        while (i < 4) {
-            if (nodo.className.search("results__link") === 0) {
-                return nodo.href.substring(nodo.href.search("#")+1);
-            } else {
-                nodo = nodo.parentElement;
-            }
-            i++;
+        // Inactivo el elemento previo si lo habí
+        let aux = document.querySelector('.results__link--active');
+        if (aux) {
+            aux.classList.remove('results__link--active');
+        }
+        // Activo y devuelvo el nuevo elemento
+        aux = target.closest(".results__link");
+        if (aux) {
+            aux.classList.add("results__link--active");
+            return aux.href.split("#")[1];
         }
     }
     getPaginator() { return this.resultPages; }
@@ -36,7 +37,7 @@ export default class SearchView {
             const recipe = recipes[i];           
             let html = 
                 `<li>
-                    <a class="results__link results__link--active" href="#${recipe.getID()}">
+                    <a class="results__link" href="#${recipe.getID()}">
                         <figure class="results__fig">
                             <img src="${recipe.getImageUrl()}" alt="Test">
                         </figure>

@@ -1,20 +1,23 @@
 // Imports
 import Search from './models/Search';
 import Recipe from './models/Recipe';
+import ShoppingList from './models/ShoppingList';
 import SearchView from './views/SearchView';
 import RecipeView from './views/RecipeView';
 import FavouritesView from './views/FavouritesView';
+import SopphingListView from './views/ShoppingListView';
 
 // Global state of the app
 const state = {
     search: undefined,
     recipe: undefined,
-    shoppingList: [],
+    shoppingList: undefined,
     favourites: [],
 }
 var searchViewCtrl;
 var recipeViewCtrl;
 var favouriteView; 
+var shoppingListView;
 
 init();
 
@@ -26,13 +29,15 @@ function init() {
     searchViewCtrl = new SearchView();
     recipeViewCtrl = new RecipeView();
     favouriteView = new FavouritesView();
+    shoppingListView = new SopphingListView();
     // Add event handlers
     document.addEventListener('keypress', (ev) => { if (ev.keyCode === '13') { eventHandlerSearch(); } });
     searchViewCtrl.getButton().addEventListener("click", eventHandlerSearch);
     searchViewCtrl.getResults().addEventListener("click", eventHandlerLoadRecipe);
     searchViewCtrl.getPaginator().addEventListener("click", eventHandlerPaginator);
-    favouriteView.getAddButton().addEventListener("click", eventHandlerAddFavs);
-    favouriteView.getPanel().addEventListener("click", eventHandlerLoadFavourite);
+    favouriteView.getRecipePanel().addEventListener("click", eventHandlerRecipePanel);
+    favouriteView.getFavouritesPanel().addEventListener("click", eventHandlerLoadFavourite);
+    shoppingListView.getShoppingListUL().addEventListener("click", eventHandlerShoppingList);
 }
 
 // Event handlers
@@ -57,16 +62,42 @@ function eventHandlerLoadRecipe(event) {
     }
 }
 
-function eventHandlerAddFavs(event) {
-    if (event.target.classList.contains("header__likes") || event.target.classList.contains("recipe__love")) {
-        if (state.recipe !== undefined) {
-            let obj = state.favourites.find(o => o.getID() === state.recipe.id);
-            if (obj === undefined) {
-                state.favourites.push(state.recipe);
-                favouriteView.addFavourite(state.recipe);
-                console.log(`Favourite added ${state.recipe.getID()}`)
-            }   
+function eventHandlerRecipePanel(event) {
+    if (event.target.closest('.recipe__love') && state.recipe) {
+        // Add to favourites
+        let obj = state.favourites.find(o => o.getID() === state.recipe.id);
+        if (obj === undefined) {
+            state.favourites.push(state.recipe);
+            favouriteView.addFavourite(state.recipe);
+            console.log(`Favourite added ${state.recipe.getID()}`)
+        }   
+    } else if (event.target.closest('.btn-tiny')) {
+        // Add/Decrease recipients
+        let button = event.target.closest('.btn-tiny');
+        if (button) {
+            if (button.dataset.goto === '+') {
+                state.recipe.changeServings(1);
+            } else {
+                state.recipe.changeServings(-1);
+            }
+            recipeViewCtrl.render(state.recipe);
         }
+    } else if (event.target.closest('.recipe__btn')) {
+        // Shopping list
+        state.shoppingList = new ShoppingList();
+        state.recipe.getIngredients().forEach(ingredient => {
+            state.shoppingList.addItem(ingredient.quantity, ingredient.unit, ingredient.description);
+        });
+        shoppingListView.render(state.shoppingList.getItems());
+    }
+}
+
+function eventHandlerShoppingList(event) {
+    let nodo = event.target.closest('.shopping__item');
+    if (nodo) {
+        let id = nodo.id.split("#sli-")[1];
+        state.shoppingList.getItems().splice(id,1);
+        shoppingListView.delete(nodo);
     }
 }
 
