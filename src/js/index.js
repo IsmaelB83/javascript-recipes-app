@@ -2,17 +2,19 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import ShoppingList from './models/ShoppingList';
+import Favourites from './models/Favourites';
 import SearchView from './views/SearchView';
 import RecipeView from './views/RecipeView';
 import FavouritesView from './views/FavouritesView';
 import SopphingListView from './views/ShoppingListView';
+import { Fraction } from 'fractional-arithmetic';
 
 // Global state of the app
 const state = {
     search: undefined,
     recipe: undefined,
     shoppingList: undefined,
-    favourites: [],
+    favourites: undefined,
 }
 var searchViewCtrl;
 var recipeViewCtrl;
@@ -28,8 +30,12 @@ function init() {
     // Instantiating controllers
     searchViewCtrl = new SearchView();
     recipeViewCtrl = new RecipeView();
+    window.recView = recipeViewCtrl;
     favouriteView = new FavouritesView();
     shoppingListView = new SopphingListView();
+    // Instantiating models
+    state.favourites = new Favourites();
+    state.shoppingList = new ShoppingList();
     // Add event handlers
     document.addEventListener('keypress', (ev) => { if (ev.keyCode === '13') { eventHandlerSearch(); } });
     searchViewCtrl.getButton().addEventListener("click", eventHandlerSearch);
@@ -38,6 +44,7 @@ function init() {
     favouriteView.getRecipePanel().addEventListener("click", eventHandlerRecipePanel);
     favouriteView.getFavouritesPanel().addEventListener("click", eventHandlerLoadFavourite);
     shoppingListView.getShoppingListUL().addEventListener("click", eventHandlerShoppingList);
+    shoppingListView.getShoppingListUL().addEventListener("change", eventHandlerShoppingList);
 }
 
 // Event handlers
@@ -84,7 +91,7 @@ function eventHandlerRecipePanel(event) {
         }
     } else if (event.target.closest('.recipe__btn')) {
         // Shopping list
-        state.shoppingList = new ShoppingList();
+        state.shoppingList.clear();
         state.recipe.getIngredients().forEach(ingredient => {
             state.shoppingList.addItem(ingredient.quantity, ingredient.unit, ingredient.description);
         });
@@ -94,10 +101,12 @@ function eventHandlerRecipePanel(event) {
 
 function eventHandlerShoppingList(event) {
     let nodo = event.target.closest('.shopping__item');
-    if (nodo) {
-        let id = nodo.id.split("#sli-")[1];
-        state.shoppingList.getItems().splice(id,1);
-        shoppingListView.delete(nodo);
+    if (event.target.closest('.shopping__delete')) {
+        if (state.shoppingList.deleteItem(nodo.id)) {
+            shoppingListView.deleteItem(nodo);
+        }
+    } else if (event.target.tagName === 'INPUT') {
+        state.shoppingList.updateQuantity(nodo.id, event.target.value);
     }
 }
 
@@ -140,7 +149,6 @@ async function controllerRetrieveRecipe(id) {
                 await state.recipe.callAPI(); 
             }
             recipeViewCtrl.render(state.recipe);
-            console.log(state.recipe);
         }
     } catch (error) {
         console.log(error);

@@ -1,4 +1,5 @@
-import { insertLoader, removeLoader } from './utils'
+import { insertLoader, removeLoader } from './utils';
+import { Fraction } from 'fractional-arithmetic';
 
 export default class RecipeView { 
 
@@ -15,6 +16,20 @@ export default class RecipeView {
         let htmlIngredients = '';
         for (let i = 0; i < recipe.ingredients.length; i++) {
             const ingredient = recipe.ingredients[i];
+            let fractionQuan;
+            // Display quantity as a fraction
+            /* try {
+                let integer, decimal, fraction;
+                console.log(ingredient.quantity);
+                [integer, decimal] = ingredient.quantity.toFixed(2).split('.');
+                fractionQuan = parseInt(integer) !== 0 ? `${integer}`:``;
+                if (parseInt(decimal) !== 0)  {
+                    fraction = new Fraction(ingredient.quantity - integer);
+                    fractionQuan += ` ${fraction.n}/${fraction.d}`;
+                }
+            } catch (error) {
+                fractionQuan = ingredient.quantity.toFixed(2)
+            } */
             htmlIngredients +=      
                 `<li class="recipe__item">
                     <svg class="recipe__icon"><use href="img/icons.svg#icon-check"></use></svg>

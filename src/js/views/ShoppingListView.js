@@ -14,7 +14,7 @@ export default class ShoppingListView {
         this.clear();
         listItems.forEach((item,i) => {
             html = 
-            `<li id="#sli-${i}" class="shopping__item">
+            `<li id="${item.id}" class="shopping__item">
                 <div class="shopping__count">
                     <input type="number" value="${item.quantity}" step="1">
                     <p>${item.unit}</p>
@@ -30,7 +30,7 @@ export default class ShoppingListView {
             this.shoppingListUL.insertAdjacentHTML('beforeend', html);
         });
     }
-    delete(nodo) {
+    deleteItem(nodo) {
         this.shoppingListUL.removeChild(nodo);
     }
     

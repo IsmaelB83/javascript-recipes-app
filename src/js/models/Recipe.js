@@ -28,7 +28,7 @@ export default class Recipe {
     // Busca la receta en la API
     async callAPI() {
         try {
-            const key = 'e93a67c1699ac5a04cccb2f54a390352';
+            const key = 'ccf20f28754ab5b310d4a62758737ba6';
             let response = await fetch (`https://www.food2fork.com/api/get?key=${key}&rId=${this.id}`);
             let content = await response.json();               
             this.title = content.recipe.title,
@@ -59,17 +59,9 @@ export default class Recipe {
         }
     }
     // Parse ingredients: quantity unit ingredient
-    parseIngredients() {
-        /* ==> this.ingredients HERE
-        0:"4 1/2 cups (20.25 ounces) unbleached high-gluten, bread, or all-purpose flour, chilled"
-        1:"1 3/4 (.44 ounce) teaspoons salt"
-        2:"1 teaspoon (.11 ounce) instant yeast"
-        3:"1/4 cup (2 ounces) olive oil (optional)"
-        4:"1 3/4 cups (14 ounces) water, ice cold (40F)"
-        5:"Semolina flour OR cornmeal for dusting"*/
-        
-        // 1st) Standardize units, everything to lower case and delete parentheses blocks
+    parseIngredients() {      
         let newIngredients = []
+        // 1st) Standardize units, everything to lower case and delete parentheses blocks
         const unitNonStd = ['cups', 'ounces', 'teaspoons', 'teaspoon', 'tablespoons', 'tablespoon', 'packages', 'package']
         const unitStd = ['cup', 'ounce', 'tsp', 'tsp', 'tbsp', 'tbsp', 'pkt', 'pkt'];
         newIngredients = this.ingredients.map(el => {
@@ -80,32 +72,22 @@ export default class Recipe {
             });
             return el;           
         });
-        this.ingredients = newIngredients;
-        
-        /* ==> this.ingredients HERE
-        0:"4 1/2 cup unbleached high-gluten, bread, or all-purpose flour, chilled"
-        1:"1 3/4 tsp salt"
-        2:"1 tsp instant yeast"
-        3:"1/4 cup olive oil "
-        4:"1 3/4 cup water, ice cold "
-        5:"semolina flour or cornmeal for dusting" */
-
         // 2nd) Split quantity (everything before unit) and unit (first word that exists in array unitStd)
+        this.ingredients = newIngredients;
+        newIngredients = [];
         try {
-            newIngredients = [];
-            let flagUnit, array;
+            let flagUnit, words;
             this.ingredients.forEach(el => {
-                array = el.split(' ');
+                words = el.split(' ');
                 flagUnit = false;
                 for (let i = 0; i < unitStd.length && flagUnit === false; i++) {
-                    const unit = unitStd[i];
-                    if (el.search(unit) > -1) {
-                        let aux = el.split(unit); // aux[0] = quantities // aux[1] = ingredient
-                        aux[0] = aux[0].replace(/\s+$/, '').replace(' ','+');
+                    if (el.search(unitStd[i]) > -1) {
+                        let aux = el.split(unitStd[i]);
+                        aux[0] = aux[0].replace(/\s+$/, '').replace(' ','+').replace('-','+');
                         newIngredients.push( 
                             {   quantity: eval(aux[0]),
-                                unit,
-                                description: aux[1].replace(/\s+$/, '')
+                                unit: unitStd[i],
+                                description: aux[1].replace(/\s+$/, '').replace(/^\s/, '')
                             }
                         );
                         flagUnit = true;
@@ -116,25 +98,25 @@ export default class Recipe {
                     let quan;
                     try {
                         // Intento convertir la primera palabra a cantidad
-                        quan = parseFloat(eval(array[0]));
+                        quan = parseFloat(eval(words[0]));
                         try {
                             // Intento convertir la primera y segunda palabra a cantidad (caso de 1 2/3 por ejemplo)
-                            quan = eval(array[0]+'+'+array[1]);
-                            array.splice(0,2);
+                            quan = eval(words[0]+'+'+words[1]);
+                            words.splice(0,2);
                             newIngredients.push( 
                                 {   quantity: quan,
                                     unit: '',
-                                    description: array.join(' ')
+                                    description: words.join(' ')
                                 }
                             );
                         } catch (error) {
                             // Cantidad y sin unidad
-                            quan = parseFloat(eval(array[0]));
-                            array.splice(0,1);
+                            quan = parseFloat(eval(words[0]));
+                            words.splice(0,1);
                             newIngredients.push( 
                                 {   quantity: quan,
                                     unit: '',
-                                    description: array.join(' ')
+                                    description: words.join(' ')
                                 }
                             );
                         }
@@ -143,7 +125,7 @@ export default class Recipe {
                         newIngredients.push( 
                             {   quantity: 1,
                                 unit: '',
-                                description: array.join(' ')
+                                description: words.join(' ')
                             }
                         );
                     }

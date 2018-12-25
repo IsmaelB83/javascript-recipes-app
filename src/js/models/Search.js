@@ -14,7 +14,7 @@ export default class Search {
     getRecipes() { return this.recipes }
     // Methods
     async callAPI(page='1') {
-        const key = 'e93a67c1699ac5a04cccb2f54a390352';        
+        const key = 'ccf20f28754ab5b310d4a62758737ba6';        
         try {
             let response = await fetch (`https://www.food2fork.com/api/search?key=${key}&q=${this.query}&page${page}`);
             let content = await response.json();
