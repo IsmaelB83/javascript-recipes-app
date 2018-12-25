@@ -11,30 +11,25 @@ export default class FavouritesView {
     getFavouritesPanel() { return this.favouritesPanel; }
     getViewFavouritesButton() { return this.viewFavouritesButton; }
     // Inserts favourite in the list
-    addFavourite(recipe) {
+    addFavourite(id, image_url, title, publisher) {
         let html = 
             `<li>
-                <a class="likes__link" href="#${recipe.id}">
+                <a class="likes__link" href="#${id}">
                     <figure class="likes__fig">
-                        <img src="${recipe.image_url}" alt="${recipe.title}">
+                        <img src="${image_url}" alt="${title}">
                     </figure>
                     <div class="likes__data">
-                        <h4 class="likes__name">${recipe.title}</h4>
-                        <p class="likes__author">${recipe.publisher}</p>
+                        <h4 class="likes__name">${title}</h4>
+                        <p class="likes__author">${publisher}</p>
                     </div>
                 </a>
             </li>`;
         this.favouritesPanel.insertAdjacentHTML('beforeend', html);
     }
-    getClicked(nodo) {
-        let parent;
-        if (nodo.classList.contains("likes__author") || nodo.classList.contains("likes__name")) {
-            parent = nodo.parentNode.parentNode;
-        } else if (nodo.classList.contains("likes__fig")) {
-            parent = nodo.parentNode;
-        } else if (nodo.classList.contains("likes__link")) {
-            parent = nodo;
+    deleteFavourite(id) {
+        let nodo = this.favouritesPanel.querySelector(`*[href="#${id}"]`);
+        if (nodo) {
+            nodo.parentElement.removeChild(nodo);
         }
-        return parent.href.split("#")[1];
     }
 }

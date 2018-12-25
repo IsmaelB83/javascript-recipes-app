@@ -13,7 +13,12 @@ export default class RecipeView {
     }
     render(recipe) {
         this.clear();
-        let htmlIngredients = '';
+        let htmlIngredients = '', heart;
+        if (recipe.liked === true) {
+            heart = 'icon-heart';
+        } else {
+            heart = 'icon-heart-outlined';
+        }
         for (let i = 0; i < recipe.ingredients.length; i++) {
             const ingredient = recipe.ingredients[i];
             let fractionQuan;
@@ -74,7 +79,7 @@ export default class RecipeView {
                 </div>
                 <button class="recipe__love">
                     <svg class="header__likes">
-                        <use href="img/icons.svg#icon-heart-outlined"></use>
+                        <use href="img/icons.svg#${heart}"></use>
                     </svg>
                 </button>
             </div>

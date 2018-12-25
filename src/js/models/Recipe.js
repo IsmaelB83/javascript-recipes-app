@@ -14,6 +14,7 @@ export default class Recipe {
         this.servings = 4;
         this.minutes = 60;
         this.loaded = false;
+        this.liked = false;
     }
     // Getters
     getID() { return this.id; }
@@ -28,7 +29,7 @@ export default class Recipe {
     // Busca la receta en la API
     async callAPI() {
         try {
-            const key = 'ccf20f28754ab5b310d4a62758737ba6';
+            const key = 'fd303a2e88fa7d8d64266fd308fa4f23';
             let response = await fetch (`https://www.food2fork.com/api/get?key=${key}&rId=${this.id}`);
             let content = await response.json();               
             this.title = content.recipe.title,
@@ -48,6 +49,7 @@ export default class Recipe {
             console.log (`Error while trying to retrieve recipe ${id}: ${error}`);
         }
     }
+    like(liked) { this.liked = liked; }
     changeServings(num) {
         if (this.servings + num > 0) {
             let oldS = this.servings;

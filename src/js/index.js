@@ -7,7 +7,7 @@ import SearchView from './views/SearchView';
 import RecipeView from './views/RecipeView';
 import FavouritesView from './views/FavouritesView';
 import SopphingListView from './views/ShoppingListView';
-import { Fraction } from 'fractional-arithmetic';
+//import { Fraction } from 'fractional-arithmetic';
 
 // Global state of the app
 const state = {
@@ -35,6 +35,9 @@ function init() {
     shoppingListView = new SopphingListView();
     // Instantiating models
     state.favourites = new Favourites();
+    state.favourites.getItems().forEach(el => {
+        favouriteView.addFavourite(el.id, el.image_url, el.title, el.publisher);
+    });
     state.shoppingList = new ShoppingList();
     // Add event handlers
     document.addEventListener('keypress', (ev) => { if (ev.keyCode === '13') { eventHandlerSearch(); } });
@@ -72,12 +75,22 @@ function eventHandlerLoadRecipe(event) {
 function eventHandlerRecipePanel(event) {
     if (event.target.closest('.recipe__love') && state.recipe) {
         // Add to favourites
-        let obj = state.favourites.find(o => o.getID() === state.recipe.id);
+        let obj = state.favourites.getItems().find(el => el.id === state.recipe.id);
         if (obj === undefined) {
-            state.favourites.push(state.recipe);
-            favouriteView.addFavourite(state.recipe);
+            state.recipe.like();
+            state.favourites.addItem(state.recipe);
+            favouriteView.addFavourite(state.recipe.getID(), state.recipe.getImageUrl(), state.recipe.getTitle(), state.recipe.getPublisher());
+            state.recipe.like(true);
+            recipeViewCtrl.render(state.recipe);
             console.log(`Favourite added ${state.recipe.getID()}`)
-        }   
+        } else {
+            // Delete from favourites
+            state.favourites.deleteItem(obj.id);
+            favouriteView.deleteFavourite(obj.id);
+            state.recipe.like(false);
+            recipeViewCtrl.render(state.recipe);
+            console.log(`Favourite deleted ${state.recipe.getID()}`)
+        }
     } else if (event.target.closest('.btn-tiny')) {
         // Add/Decrease recipients
         let button = event.target.closest('.btn-tiny');
@@ -112,9 +125,12 @@ function eventHandlerShoppingList(event) {
 
 function eventHandlerLoadFavourite(event) {
     try {
-        let id = favouriteView.getClicked(event.target);
-        controllerRetrieveRecipe(id);          
-        console.log(`Favourite loaded ${id}`);
+        let nodo = event.target.closest('.likes__link');
+        if (nodo) {
+            let id = nodo.href.split('#')[1];
+            controllerRetrieveRecipe(id);
+            console.log(`Favourite loaded ${id}`);
+        }
     } catch (error) {
         console.log(`Error loading favourite ${error}, clicked in ${event.target}`);
     }
@@ -137,19 +153,22 @@ async function controllerRetrieveSearch(query) {
 
 async function controllerRetrieveRecipe(id) {
     try {
-        let obj = state.search.recipes.find(o => o.getID() === id);
+        let obj;
+        if (state.search !== undefined) {
+            obj = state.search.recipes.find(o => o.getID() === id);
+        }
         recipeViewCtrl.renderLoader();
         if (obj === undefined) {
             state.recipe = new Recipe(id);
             await state.recipe.callAPI(); 
-            recipeViewCtrl.render(state.recipe);
         } else if (obj !== undefined && ( state.recipe === undefined || obj.getID() !== state.recipe.getID())) {
             state.recipe = obj;
             if (state.recipe.getLoaded() !== true) {
                 await state.recipe.callAPI(); 
             }
-            recipeViewCtrl.render(state.recipe);
         }
+        state.recipe.like(state.favourites.checkRecipe(state.recipe.getID()));
+        recipeViewCtrl.render(state.recipe);
     } catch (error) {
         console.log(error);
     }
